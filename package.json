@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test",
-    "start": "node index.js",
-    "your-custom-script": "echo npm"
+    "start": "node --use-strict index.js"
   },
   "author": "Harold Perry",
   "license": "ISC",
