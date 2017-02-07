@@ -3,11 +3,13 @@
 // CONFIG: Express
 const path = require('path')
 const express = require('express')
+const bodyParser = require('body-parser')
+const urlencodedParser = bodyParser.urlencoded({extended: false})
 const exphbs = require('express-handlebars')
 
 // CONFIG: PostgreSQL
 const pg = require('pg')
-const conString = 'postgres://nodehero:4rfv_Oreh@localhost/node_hero'
+const conString = 'postgres://node_hero:4rfv_Oreh@localhost/node_hero'
 // const conString = 'postgres://harold:9ol._Yfit@localhost/node_hero'
 
 const app = express()
@@ -46,8 +48,10 @@ app.use((err, request, response, next) => {
   response.status(500).send('Something broke!')
 })
 
-app.post('/users', function (req, res, next) {
+app.post('/users', urlencodedParser, function (req, res, next) {
   const user = req.body
+
+  console.log("Body: " + req.body.name)
 
   pg.connect(conString, function (err, client, done) {
     if (err) {
@@ -88,8 +92,8 @@ app.get('/populate', function (req, res, next) {
     if (err) {
       return next(err)
     }
-    for (i = 0; i < 10; i++) {
-      client.query('INSERT INTO users (name, age) VALUES ($1, $2);', ['Jimmy', 10], function (err, result) {
+    for (var i = 0; i < 10; i++) {
+      client.query('INSERT INTO users (name, age) VALUES ($1, $2);', ["Jimmy " + i, i], function (err, result) {
 
         done()
 
