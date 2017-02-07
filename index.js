@@ -1,7 +1,14 @@
 // index.js
+
+// CONFIG: Express
 const path = require('path')
 const express = require('express')
 const exphbs = require('express-handlebars')
+
+// CONFIG: PostgreSQL
+const pg = require('pg')
+const conString = 'postgres://nodehero:4rfv_Oreh@localhost/node_hero'
+// const conString = 'postgres://harold:9ol._Yfit@localhost/node_hero'
 
 const app = express()
 
@@ -31,9 +38,71 @@ app.get('/', (request, response) => {
   })
 })
 
+const users = []
+
+
 app.use((err, request, response, next) => {
   console.log(err)
   response.status(500).send('Something broke!')
 })
+
+app.post('/users', function (req, res, next) {
+  const user = req.body
+
+  pg.connect(conString, function (err, client, done) {
+    if (err) {
+      return next(err)
+    }
+    client.query('INSERT INTO users (name, age) VALUES ($1, $2);', [user.name, user.age], function (err, result) {
+      done()
+
+      if (err) {
+        return next(err)
+      }
+
+      res.sendStatus(200)
+    })
+  })
+})
+
+app.get('/users', function(req, res, next) {
+  pg.connect(conString, function (err, client, done) {
+    if (err) {
+      return next(err)
+    }
+    client.query('SELECT name, age FROM users;', [], function (err, result) {
+      done()
+
+      if (err) {
+        return next(err)
+      }
+      res.json(result.rows)
+    })
+  })
+})
+
+app.get('/populate', function (req, res, next) {
+  const user = req.body
+
+  pg.connect(conString, function (err, client, done) {
+    if (err) {
+      return next(err)
+    }
+    for (i = 0; i < 10; i++) {
+      client.query('INSERT INTO users (name, age) VALUES ($1, $2);', ['Jimmy', 10], function (err, result) {
+
+        done()
+
+        if (err) {
+          return next(err)
+        }
+      })
+    }
+    res.sendStatus(200)
+  })
+})
+
+
+
 
 app.listen(3000)
