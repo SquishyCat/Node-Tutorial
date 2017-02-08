@@ -4,13 +4,11 @@
 const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
-const urlencodedParser = bodyParser.urlencoded({extended: false})
 const exphbs = require('express-handlebars')
 
 // CONFIG: PostgreSQL
 const pg = require('pg')
 const conString = 'postgres://node_hero:4rfv_Oreh@localhost/node_hero'
-// const conString = 'postgres://harold:9ol._Yfit@localhost/node_hero'
 
 const app = express()
 
@@ -21,6 +19,9 @@ app.engine('.hbs', exphbs({
 }))
 app.set('view engine', '.hbs')
 app.set('views', path.join(__dirname, 'views'))
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: false}))
 
 app.use((request, response, next) => {
   request.chance = 0
@@ -48,8 +49,9 @@ app.use((err, request, response, next) => {
   response.status(500).send('Something broke!')
 })
 
-app.post('/users', urlencodedParser, function (req, res, next) {
-  const user = req.body
+// app.post('/users', urlencodedParser, function (req, res, next) {
+app.post('/users', function (req, res, next) {
+    const user = req.body
 
   console.log("Body: " + req.body.name)
 
